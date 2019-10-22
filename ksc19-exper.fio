@@ -1,0 +1,15 @@
+[global]
+bs=4k
+ioengine=libaio
+iodepth=128
+direct=1
+directory=/home/young/mnt
+group_reporting
+
+[exper]
+numjobs=10
+nrfiles=1
+filesize=10g
+rw=randwrite
+overwrite=1
+create_on_open=1
