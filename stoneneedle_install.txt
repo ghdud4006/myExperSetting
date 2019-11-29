@@ -1,0 +1,58 @@
+*** ubuntu 14.04 StoneNeedle installation ***
+
+
+sudo -i
+apt-get install git vim-gtk bc libncurses5-dev libncursesw5-dev wget tmux -y
+mkdir temp
+cd temp
+git clone https://github.com/ghdud4006/StoneNeedle
+wget http://ftp.riken.jp/Linux/kernel.org/linux/kernel/v3.x/linux-3.13.tar.gz
+tar xzvf linux-3.13.tar.gz
+cp StoneNeedle/drivers/block/* linux-3.13/drivers/block/
+cd linux-3.13
+vi drivers/block/Makefile
+------------------------- Makefile --------------------------------
+obj-$(CONFIG_STONENEEDLE) += stoneneedle.o
+--------------------------------------------------------------------
+vi drivers/block/Kconfig
+------------------------- Kconfig --------------------------------
+config STONENEEDLE
+	tristate "STONENEEDLE"
+	default y
+--------------------------------------------------------------------
+rm -rf /usr/src/linux-3.13-kernel
+mkdir /usr/src/linux-3.13-kernel
+make mrproper && make clean
+make O=/usr/src/linux-3.13-kernel menuconfig
+------------------------- menuconfig -----------------------------
+block device *
+NVM Express M
+STONENEEDLE *
+--------------------------------------------------------------------
+cd /usr/src/linux-3.13-kernel
+make -j8 && make modules_install -j8 && make install -j8
+vi /etc/default/grub
+------------------------- grub -----------------------------
+ GROUB_DEFAULT="1>2"
+-------------------------------------------------------------
+update-grub
+reboot
+
+//////////////////////////
+//////////////////////////
+//////////////////////////
+
+(3.13.0)
+
+uname -r
+lsmod | grep nvme
+lsmod | grep stone
+ls /proc | grep stone
+
+/////////////////////
+/// interface ////
+////////////////////
+echo "start nvme0n1" > /proc/stoneneedle/controller
+fio --directory=/work --name fio_test_file --direct=1 --rw=randread --bs=4K --size=1G --numjobs=16 --time_based --runtime=30 --group_reporting --norandommap
+cat /proc/stoneneedle/nvme0n1
+echo "stop nvme0n1" > /proc/stoneneedle/controller

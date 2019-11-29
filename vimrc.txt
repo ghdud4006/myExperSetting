@@ -1,0 +1,42 @@
+
+git clone http://github.com/VundleVim/Vundle.Vim ~/.vim/bundle/Vundle.vim
+//////////////////////// vimrc /////////////////////////////////////
+
+set rtp+=~/.vim/bundle/Vundle.vim
+set number
+
+call vundle#begin()
+
+Plugin 'gmarik/Vundle.vim'
+Plugin 'The-NERD-Tree' 
+Plugin 'Source-Explorer-srcexpl.vim' 
+Plugin 'SrcExpl' 
+Plugin 'taglist.vim' 
+Plugin 'AutoComplPop'
+Plugin 'snipMate' 
+call vundle#end()
+
+
+"========== AutoCompletePop ==========
+function! InsertTabWrapper()
+    let col=col('.')-1
+    if !col||getline('.')[col-1]!~'\k'
+        return "\<TAB>"
+    else
+        if pumvisible()
+            return "\<C-N>"
+        else
+            return "\<C-N>\<C-P>"
+        end 
+    endif
+endfunction
+
+inoremap <TAB> <c-r>=InsertTabWrapper()<cr>
+hi Pmenu ctermbg=blue
+hi PmenuSel ctermbg=yellow ctermbg=black
+hi PmenuSbar ctermbg=blue
+
+
+/////////////////////////////////////////////////////////////////////
+vim ¿¡¼­
+:BundleInstall
